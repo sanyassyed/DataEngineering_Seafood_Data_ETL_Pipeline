@@ -1,1 +1,8 @@
+# Virtual Env
 .my_env/
+
+# Data files
+# exclude everything
+data/*
+# exception to the rule
+!data/.gitkeep 

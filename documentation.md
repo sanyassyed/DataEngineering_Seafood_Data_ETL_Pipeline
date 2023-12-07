@@ -8,8 +8,8 @@ Find here the steps taken to create the project
     * Steps to clone repo on local system
         1. Create a ssh key on the local system to connect to the GitHub repo as follows [More Info Here](https://github.com/xyzssyed/sf_eviction/blob/master/docs/README_Dev.md)
             ```bash
-                xyz@pc MINGW64 /d/Documents
-                $ ssh-keygen -t rsa
+                # Generate SSH-Key
+                ssh-keygen -t rsa
                 Generating public/private rsa key pair.
                 Enter file in which to save the key (/c/Users/xyz/.ssh/id_rsa):
                 Created directory '/c/Users/xyz/.ssh'.
@@ -21,19 +21,16 @@ Find here the steps taken to create the project
                 *****
                 *****
             ```
-        1. Add a config file to .ssh folder as follows
+        2. Add a config file to .ssh folder as follows
             ```bash
-                xyz@pc MINGW64 /d/Documents
-                $ cd /c/Users/xyz/.ssh/
-
-                xyz@pc MINGW64 ~/.ssh
-                $ ls
+                # Goto .ssh directory
+                cd /c/Users/xyz/.ssh/
+                # Check if keys are created
+                ls
                 id_rsa  id_rsa.pub
-
-                xyz@pc MINGW64 ~/.ssh
-                $ nano config
-
-                # and write the below to file [Ctrl + O + Enter to save, Ctrl+X to exit]
+                # Create config file
+                nano config
+                # write the below to file [NOTE: Ctrl + O + Enter to save, Ctrl+X to exit]
                 # write the path to the key from the root ~ and not /home
                     Host github.com
                         User git
@@ -44,15 +41,14 @@ Find here the steps taken to create the project
 
         1. Clone the poject repo in the Documents folder
             ```bash
-               xyz@pc MINGW64 ~/.ssh
-                $ cd /d/Documents/
-
-                xyz@pc MINGW64 /d/Documents
-                $ git clone git@github.com:xyz/SeafoodProject.git
-                Cloning into 'SeafoodProject'...
+                # Goto root folder for project
+               cd /d/Documents/
+               git clone git@github.com:xyz/SeafoodProject.git
+               Cloning into 'SeafoodProject'...
             ```
         1. Test if you are above to push to the repo
             ```bash
+                # Goto project folder
                 cd SeafoodProject
                 # check the remote origin is set with ssh
                 git remote -v
@@ -105,4 +101,3 @@ Find here the steps taken to create the project
             # Install pandas, datetime, pytz
             pip install pandas datetime pytz
         ```
-    
