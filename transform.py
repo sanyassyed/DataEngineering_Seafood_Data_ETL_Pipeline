@@ -1,4 +1,6 @@
+# -*- coding: utf-8 -*-
 import pandas as pd
+import os
 from datetime import datetime
 from pytz import timezone
 
@@ -7,19 +9,113 @@ date_frmt = '%Y%m%d_%H%M'
 my_date = datetime.now(central_tz).strftime(date_frmt)
 print(my_date)
 
-def extract() -> None:
-    return None
+def extract(data_dir, source_file, sheets):
+    file_loc = os.path.join(data_dir, source_file)
+    df_i = pd.read_excel(file_loc, sheet_name = sheets[0])
+    df_p = pd.read_excel(file_loc, sheet_name = sheets[1])
+    
+    # testing
+    #print(df_i.head())
+    #print(df_p.head())
+    print(f"Inventory data size (rows,cols): {df_i.shape}")
+    print(f"Production data size (rows,cols): {df_p.shape}")
+    #print(df_i.columns)
+    #print(df_p.columns)
+    #print(df_i.dtypes)
 
-def transf() -> None:
+    return df_i, df_p
+
+def transf(df_i, df_p, desti_file_i, desti_file_p) -> None:
+    # using dictionary to convert specific columns
+    cols_i = ['FileCreationDate', 
+                'FileCreationTime', 
+                'Brand', 
+                'LocationID', 
+                'LocationName', 
+                'InventoryDate', 
+                'InventoryTime', 
+                'DCItemNumber', 
+                'ExclusiveIndicator', 
+                'CatchWeightIndicator', 
+                'ItemName', 
+                'ItemDescription', 
+                'ItemPriceperUOM', 
+                'ItemPriceUOM', 
+                'BrandItemNumber', 
+                'ItemCasePackQuantity', 
+                'ItemCasePackQuantityUOM', 
+                'ManufacturerItemNumber', 
+                'ManufacturerItemDescription', 
+                'ManufacturerName', 
+                'ManufacturerID', 
+                'ManufacturerGLN', 
+                'QuantityOnHand', 
+                'InventoryUOM', 
+                'QuantityOnHandinCases', 
+                'QuantityOnHandinPounds', 
+                'QuantityShipped', 
+                'QuantityAvailable', 
+                'QuantityCommitted', 
+                'QuantityOnHold', 
+                'QuantityWIP', 
+                'UniqueRawIngredientValue', 
+                'QuantityNextDaySales', 
+                'QuantityonOrder', 
+                'QuantityReceived', 
+                'QuantityReturned', 
+                'QuantitySold', 
+                'QuantityWarehouseAdjustments', 
+                'ShelfLifeDaysRemaining', 
+                'NumberofPricingUOMperInventoryUOM', 
+                'NumberofInventoryUOMperCustomerInvoiceUOM', 
+                'LotNumber ', 
+                'ExpirationDate', 
+                'S1ProductionReceiptQuantity', 
+                'S1ProductionReceiptDate', 
+                'S2ProductionReceiptQuantity', 
+                'S2ProductionReceiptDate', 
+                'S3ProductionReceiptQuantity', 
+                'S3ProductionReceiptDate']
+    cols_p = ['FileCreationDate', 
+              'FileCreationTime', 
+              'Brand', 
+              'LocationID',
+              'LocationName', 
+              'InventoryDate', 
+              'InventoryTime', 
+              'ItemName',
+              'ItemCasePackQuantity',
+              'ItemCasePackQuantityUOM',
+              'ManufacturerItemNumber', 
+              'ManufacturerItemDescription',
+              'ManufacturerName', 
+              'InventoryUOM', 
+              'LotNumber', 
+              'ProductionDate',
+              'ProductionQuantity', 
+              'FreezerInboundDate', 
+              'FreezerInboundQuantity']
+    print(f'Writing to {desti_file_i}')
+    df_i[cols_i].to_csv(desti_file_i, sep=str('|'), index=False)
+    # df_i[cols_i].to_csv(desti_file_i, sep=str('|'), lineterminator= '\r\n', index=False)
+
+    print(f'Writing to {desti_file_p}')
+    df_p[cols_p].to_csv(desti_file_p, sep=str('|'), index=False)
+    
+    #TODO: Test CRLF is included when writing to the text file by inserting CRLF in the csv files
+    
     return None
 
 def load() -> None:
     return None
 
 if __name__ == "__main__":
-    source_file_name = ""
     # file name format = supplier_name_suppinv_YYYYMMDD_HHmm
-    desti_file_name = f""
-    extract()
-    transf()
+    data_dir = "data"
+    source_file = "AquaSource_Inventory_Production_Data.xlsx"
+    sheets = ['Aquasource_inventory', 'Aquasource_production']
+    desti_file_i = os.path.join(data_dir, f"TEST_supplier_name_suppinv_{my_date}.txt")
+    desti_file_p = os.path.join(data_dir, f"TEST_supplier_name_suppprod_{my_date}.txt")
+    df_i, df_p = extract(data_dir, source_file, sheets)
+    transf(df_i, df_p, desti_file_i, desti_file_p)
     load()
