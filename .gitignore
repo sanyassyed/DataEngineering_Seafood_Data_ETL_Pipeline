@@ -1,6 +1,14 @@
 # Virtual Env
 .my_env/
 
+# Environment Variables
+.env_main
+.env
+
+# Credentials Folder
+credentials/*
+!credentials/.gitkeep
+
 # Data files
 # exclude everything
 data/*
