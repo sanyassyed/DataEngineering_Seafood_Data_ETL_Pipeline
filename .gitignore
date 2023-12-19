@@ -12,5 +12,7 @@ credentials/*
 # Data files
 # exclude everything
 data/*
+aq_upload/*
 # exception to the rule
 !data/.gitkeep 
+!aq_upload/.gitkeep

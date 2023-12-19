@@ -41,13 +41,6 @@ def extract_gdrive(url, sheets):
     
     print(f"Extracted Inventory data of size (rows,cols): {df_i.shape}")
     print(f"Extracted Production data of size (rows,cols): {df_p.shape}")
-    
-    # testing
-    #print(df_i.head())
-    #print(df_p.head())
-    #print(df_i.columns)
-    #print(df_p.columns)
-    #print(df_i.dtypes)
 
     return df_i, df_p
 

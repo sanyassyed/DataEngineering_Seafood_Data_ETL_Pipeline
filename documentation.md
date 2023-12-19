@@ -102,4 +102,51 @@ Find here the steps taken to create the project
             pip install pandas datetime pytz
         ```
 
-* 
+## Testing file upload to remote server
+This involves the following steps
+
+1. Create a remote server /instance: 
+    * If using the oracle learning platform, create instance by uploading the public key on the system
+    * Then use the system terminal to log into the instance just created as follows
+        ```bash
+            # find the username for the instance created by clicking on the instance name in the dashboard and scrolling down to 'Instance Access' info
+            ssh -i ./.ssh/id_rsa opc@external_ip 
+        ```
+    * Now you are in the server of the instace just created logged in as opc user
+    * Create a new user named user1 with a password as follows [Source:Manage users on Linux](https://youtu.be/19WOD84JFxA?si=tNLPzMmHFXEflJjQ)
+        ```bash
+            # creates user named user1 with a home directory
+            sudo useradd -m user1
+            # creates a password for the user1
+            sudo passwd user1
+            # check if user is created
+            grep user1 /etc/passwd  
+            # check if passwd is created for the user1
+            grep user1 /etc/shadow 
+        ```
+    * Now change the privilages for user1 to be able to log into the server via ssh using password and not key [Source](https://www.youtube.com/watch?v=9jC2JyLQZbk)
+        ```bash
+            # open the ssh config file in admin mode
+            sudo nano /etc/ssh/sshd_config
+            # Comment the following line in the file
+            #AuthorizedKeyFile .ssh/suthorized_keys .ssh/authorized_keys2
+            # change the following lines in the file
+            PasswordAuthentication yes
+            PermitRootLogin yes
+            # Ctrl + O & Ctrl + X (for save and exit)
+            # restart the sshd
+            sudo systemctl restart sshd
+        ```
+    * You can now log into the remote server by using the username and password just created as follows via ssh
+        ```bash
+            # option 1 without specifying the port number, default for ssh is 22
+            ssh user1@external_ip 
+            # option 2
+            ssh -p 22 user1@external_ip
+            # it will as for password which you can enter when prompted
+        ```
+    * Credentials if logging in via sftp in python
+        * USERNAME=user1
+        * PASSWORD=password
+        * PORT=22
+        * HOST=external_ip
