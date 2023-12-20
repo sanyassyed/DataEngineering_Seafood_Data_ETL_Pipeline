@@ -101,16 +101,29 @@ Find here the steps taken to create the project
             # Install pandas, datetime, pytz
             pip install pandas datetime pytz
         ```
+## Data Extraction
 
-## Testing file upload to remote server
-This involves the following steps
+## Data Transformation
+
+
+### TODO
+-----
+* Calculate the `ShelfLifeDaysRemaining` from the value in the column `ExpirationDate`
+
+## Data Loading
+
+Testing file upload to remote server. This involves the following steps
 
 1. Create a remote server /instance: 
     * If using the oracle learning platform, create instance by uploading the public key on the system
+        * [How to create account for Oracle Learning in Luna Lab](https://youtu.be/HOB5dhbcAyo?si=YtRMN-pLgoYRaa3n)
+        * [Course with Lab](https://luna.oracle.com/lab/facec73e-8517-4314-877f-d4f8f429c5ab/steps)
+        * [DTC Zoomcamp Video to create & log into instance on GCP](https://youtu.be/ae-CV2KfoN0?si=5jR9D7vydv3_YUVZ)
+
     * Then use the system terminal to log into the instance just created as follows
         ```bash
             # find the username for the instance created by clicking on the instance name in the dashboard and scrolling down to 'Instance Access' info
-            ssh -i ./.ssh/id_rsa opc@external_ip 
+            ssh -i /home/luna.user/.ssh/id_rsa opc@external_ip 
         ```
     * Now you are in the server of the instace just created logged in as opc user
     * Create a new user named user1 with a password as follows [Source:Manage users on Linux](https://youtu.be/19WOD84JFxA?si=tNLPzMmHFXEflJjQ)
@@ -130,6 +143,7 @@ This involves the following steps
             sudo nano /etc/ssh/sshd_config
             # Comment the following line in the file
             #AuthorizedKeyFile .ssh/suthorized_keys .ssh/authorized_keys2
+            #PasswordAuthentication no
             # change the following lines in the file
             PasswordAuthentication yes
             PermitRootLogin yes
@@ -145,8 +159,23 @@ This involves the following steps
             ssh -p 22 user1@external_ip
             # it will as for password which you can enter when prompted
         ```
-    * Credentials if logging in via sftp in python
+    
+    1. Create a folder named `/uploads` in the root directory 
+        ```bash
+            mkdir /uploads
+        ```
+
+    1. Credentials if logging in via sftp in python
         * USERNAME=user1
         * PASSWORD=password
         * PORT=22
         * HOST=external_ip
+
+    
+    1. Upload file/folder to remote server via SFTP using python. [Video Source](https://www.youtube.com/watch?v=IQh0K_6ecrU&t=424s)
+
+    1. Upload the pandas dataframe as a txt directly to the sever via sftp
+
+  
+
+

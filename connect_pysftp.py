@@ -39,3 +39,4 @@ with pysftp.Connection(host=sftpHost,
     x = sftp.listdir("./uploads")
     print(x)
 
+
