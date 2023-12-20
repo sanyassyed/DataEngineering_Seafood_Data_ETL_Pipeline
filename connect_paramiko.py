@@ -10,7 +10,7 @@ PASSWORD = config("PASSWORD")
 PORT=int(config("PORT"))
 IP_ADDRESS=config("IP_ADDRESS")
 
-# print(IP_ADDRESS, PORT, USERNAME, PASSWORD)
+print(IP_ADDRESS, PORT, USERNAME, PASSWORD)
 
 ssh = paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())

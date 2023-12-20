@@ -141,12 +141,13 @@ Testing file upload to remote server. This involves the following steps
         ```bash
             # open the ssh config file in admin mode
             sudo nano /etc/ssh/sshd_config
-            # Comment the following line in the file
+            # Comment or uncomment the following line in the file
+            
+            PermitRootLogin yes
             #AuthorizedKeyFile .ssh/suthorized_keys .ssh/authorized_keys2
             #PasswordAuthentication no
-            # change the following lines in the file
             PasswordAuthentication yes
-            PermitRootLogin yes
+            Subsystem sftp  internal-sftp
             # Ctrl + O & Ctrl + X (for save and exit)
             # restart the sshd
             sudo systemctl restart sshd
@@ -160,9 +161,10 @@ Testing file upload to remote server. This involves the following steps
             # it will as for password which you can enter when prompted
         ```
     
-    1. Create a folder named `/uploads` in the root directory 
+    1. Create a folder named `uploads` in the root directory 
         ```bash
-            mkdir /uploads
+            mkdir uploads
+            # the absolute path of this directory is /home/user1/uploads
         ```
 
     1. Credentials if logging in via sftp in python
