@@ -99,8 +99,6 @@ def write_local(df_i, df_p, desti_file_i, desti_file_p, write_folder_local):
     print(f'Writing production data of size (rows, cols) {df_p.shape} to {desti_file_p}')
     df_p[cols_p].to_csv(write_path_p, sep=str('|'), index=False)
 
-# Extracting file from gdrive
-# https://stackoverflow.com/questions/37243121/using-pandas-to-read-in-excel-file-from-url-xlrderror
 
 
 if __name__ == "__main__":

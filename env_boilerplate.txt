@@ -1,0 +1,14 @@
+# set -o allexport && source .env && set +o allexport
+# SFTP Connection credentials
+SPREADSHEET_ID=
+USER_NAME_CSCS=
+PASSWORD_CSCS=
+PORT_CSCS=
+LOCATION_CSCS=
+IP_ADDRESS_CSCS=
+
+# Test Server
+USER_NAME=
+PASSWORD=
+PORT=
+IP_ADDRESS=

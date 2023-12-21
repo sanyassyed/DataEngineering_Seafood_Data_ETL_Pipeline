@@ -1,11 +1,16 @@
 # Documentation
 Find here the steps taken to create the project
-
+## Initial Setup
+### Git
 * Created a project repository on GitHub `SeafoodProject`
 * Used Codespace to execute the project
 * Started work on creating the python code to transform the data
+
+### Local System
 * Moving work to local machine
+    
     * Steps to clone repo on local system
+        
         1. Create a ssh key on the local system to connect to the GitHub repo as follows [More Info Here](https://github.com/xyzssyed/sf_eviction/blob/master/docs/README_Dev.md)
             ```bash
                 # Generate SSH-Key
@@ -21,7 +26,7 @@ Find here the steps taken to create the project
                 *****
                 *****
             ```
-        2. Add a config file to .ssh folder as follows
+        1. Add a config file to .ssh folder as follows
             ```bash
                 # Goto .ssh directory
                 cd /c/Users/xyz/.ssh/
@@ -61,18 +66,19 @@ Find here the steps taken to create the project
             git config --list 
         ```
 
-        1. If not; set the global config as follows
+        7. If not; set the global config as follows
         ```bash
             # set the global variables
             git config --global user.email "xyz@gmail.com"
             git config --global user.name "xyz pc"
         ```
-    * Add .gitignore file as follows
-    ```bash
-        nano .gitignore
-        # add enter the files to be ignored
 
-    ``` 
+        8. Add .gitignore file as follows
+        ```bash
+            nano .gitignore
+            # add enter the files to be ignored
+
+        ``` 
     * Create a virtual conda environment to work on the project
         1. Open Gitbash
         1. Initialize conda for Git Bash as follows to view base conda environment
@@ -100,18 +106,20 @@ Find here the steps taken to create the project
             pip list
             # Install pandas, datetime, pytz
             pip install pandas datetime pytz
+
         ```
+
 ## Data Extraction
+* Data was moved to Google Spreadsheets
+* Data was extracted directly from GDrive by setting the Googlesheets permission to `View` for `Anyine with Link` [Source](https://stackoverflow.com/questions/37243121/using-pandas-to-read-in-excel-file-from-url-xlrderror)
+* Using the document_id the google spreadsheet was extracted.
+
 
 ## Data Transformation
-
-
-### TODO
------
-* Calculate the `ShelfLifeDaysRemaining` from the value in the column `ExpirationDate`
+* The data validation was performed at the Google Spreadsheet level E.g. Calculating the `ShelfLifeDaysRemaining` from the value in the column `ExpirationDate`. Value is 0 if Expiration Date is crossed
+* Transformation in the code: The column names that were required and their order was preserved
 
 ## Data Loading
-
 Testing file upload to remote server. This involves the following steps
 
 1. Create a remote server /instance: 
@@ -177,6 +185,19 @@ Testing file upload to remote server. This involves the following steps
     1. Upload file/folder to remote server via SFTP using python. [Video Source](https://www.youtube.com/watch?v=IQh0K_6ecrU&t=424s)
 
     1. Upload the pandas dataframe as a txt directly to the sever via sftp
+
+    ## NOTE:
+    * When performing data entry remeber to read the `DATA ENTRY INSTRUCTIONS` sheet first
+    * Always remember to enter the mandatory fields
+    * `ShelfLifeDaysRemaining` value is 0 if `ExpirationDate` is crossed
+    * During testing do not pull the data from the Googlesheets URL continuously as it will lead to `403: Forbidden` Error as there is a usage limit per 100 seconds
+    * When running the code locally remeber to:
+        - use the GitBash terminal in VSCode
+        - activate the project virtual env using `conda activate .my_env`
+        - check if all the enviroment variables in the file `.env` have the right values
+        - set the environment variables using `set -o allexport && source .env && +o allexport`
+        - check the mode in the transform.py file if it is `local` or `server`
+        - run the code as `python transform.py`
 
   
 
