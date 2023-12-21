@@ -16,12 +16,12 @@ config = AutoConfig(search_path='.env')
 USERNAME = config("USER_NAME")
 PASSWORD = config("PASSWORD")
 PORT=config("PORT")
-LOCATION=config("LOCATION_CSCS")
 IP_ADDRESS=config("IP_ADDRESS")
+LOCATION=config("LOCATION_CSCS")
 SPREADSHEET_ID=config("SPREADSHEET_ID")
 
 #testing
-print(f'Username: {USERNAME}, Password: {PASSWORD}, Port:{PORT}, IP_adress: {IP_ADDRESS}, SpreadsheetId:{SPREADSHEET_ID}')
+#print(f'Username: {USERNAME}, Password: {PASSWORD}, Port:{PORT}, IP_adress: {IP_ADDRESS}, SpreadsheetId:{SPREADSHEET_ID}')
 
 def extract_gdrive(url, sheets):
     df_i = None
