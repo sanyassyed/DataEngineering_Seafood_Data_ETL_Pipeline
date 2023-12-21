@@ -26,13 +26,14 @@ print(f'Username: {USERNAME}, Password: {PASSWORD}, Port:{PORT}, IP_adress: {IP_
 def extract_gdrive(url, sheets):
     df_i = None
     df_p = None
-
-    df_i = pd.read_excel(url, sheet_name = sheets[0])
-    df_p = pd.read_excel(url, sheet_name = sheets[1])
-    
+    try:
+        df_i = pd.read_excel(url, sheet_name = sheets[0])
+        df_p = pd.read_excel(url, sheet_name = sheets[1])
+    except Exception as e:
+        print(f'Error: {e}! - File Extraction Failed')
+        return None, None
     print(f"Extracted Inventory data of size (rows,cols): {df_i.shape}")
     print(f"Extracted Production data of size (rows,cols): {df_p.shape}")
-
     return df_i, df_p
 
 
@@ -50,8 +51,8 @@ def connection_open():
         print('SFTP Connection opened')
     except pk.AuthenticationException:
         print('ERROR : Authentication failed because of irrelevant details!')
-    except:
-        print(f'ERROR : Could not connect to {IP_ADDRESS}')
+    except Exception as e:
+        print(f'ERROR: {e}')
     return ssh, sftp_client
 
 def connection_close(ssh, sftp_client):
@@ -62,111 +63,6 @@ def connection_close(ssh, sftp_client):
     return None
     
 
-def trans_conn_load(df_i, df_p, desti_file_i, desti_file_p):
-    # Creating list of column names to preserve the order of the columns
-    cols_i = ['FileCreationDate', 
-                'FileCreationTime', 
-                'Brand', 
-                'LocationID', 
-                'LocationName', 
-                'InventoryDate', 
-                'InventoryTime', 
-                'DCItemNumber', 
-                'ExclusiveIndicator', 
-                'CatchWeightIndicator', 
-                'ItemName', 
-                'ItemDescription', 
-                'ItemPriceperUOM', 
-                'ItemPriceUOM', 
-                'BrandItemNumber', 
-                'ItemCasePackQuantity', 
-                'ItemCasePackQuantityUOM', 
-                'ManufacturerItemNumber', 
-                'ManufacturerItemDescription', 
-                'ManufacturerName', 
-                'ManufacturerID', 
-                'ManufacturerGLN', 
-                'QuantityOnHand', 
-                'InventoryUOM', 
-                'QuantityOnHandinCases', 
-                'QuantityOnHandinPounds', 
-                'QuantityShipped', 
-                'QuantityAvailable', 
-                'QuantityCommitted', 
-                'QuantityOnHold', 
-                'QuantityWIP', 
-                'UniqueRawIngredientValue', 
-                'QuantityNextDaySales', 
-                'QuantityonOrder', 
-                'QuantityReceived', 
-                'QuantityReturned', 
-                'QuantitySold', 
-                'QuantityWarehouseAdjustments', 
-                'ShelfLifeDaysRemaining', 
-                'NumberofPricingUOMperInventoryUOM', 
-                'NumberofInventoryUOMperCustomerInvoiceUOM', 
-                'LotNumber ', 
-                'ProductionDate',
-                'ExpirationDate', 
-                'S1ProductionReceiptQuantity', 
-                'S1ProductionReceiptDate', 
-                'S2ProductionReceiptQuantity', 
-                'S2ProductionReceiptDate', 
-                'S3ProductionReceiptQuantity', 
-                'S3ProductionReceiptDate']
-    cols_p = ['FileCreationDate', 
-              'FileCreationTime', 
-              'Brand', 
-              'LocationID',
-              'LocationName', 
-              'InventoryDate', 
-              'InventoryTime', 
-              'ItemName',
-              'ItemCasePackQuantity',
-              'ItemCasePackQuantityUOM',
-              'ManufacturerItemNumber', 
-              'ManufacturerItemDescription',
-              'ManufacturerName', 
-              'InventoryUOM', 
-              'LotNumber', 
-              'ProductionDate',
-              'ProductionQuantity', 
-              'FreezerInboundDate', 
-              'FreezerInboundQuantity']
-    
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(hostname=IP_ADDRESS, 
-                username=USERNAME,
-                password=PASSWORD,
-                port=PORT)
-    sftp_client=ssh.open_sftp()
-
-    upload_file_path = f'/home/{USERNAME}/uploads'
-
-    # get current working directory
-    print('Connected to SFTP')
-
-    # move to the uploads directory
-    # sftp_client.chdir('./uploads')
-    sftp_client.chdir(upload_file_path)
-    print(f'Changed directory to {sftp_client.getcwd()} for upload')
-
-    
-    # put the df in the uploads directory
-    with sftp_client.open(desti_file_i, "w") as f:
-        df_i[cols_i].to_csv(f, sep=str('|'), index=False)
-    print('Upload of Invertory File Complete')
-    
-    with sftp_client.open(desti_file_p, "w") as g:
-        df_p[cols_p].to_csv(g, sep=str('|'), index=False)
-    print('Upload of Production File Complete')
-
-    # Close the connections
-    sftp_client.close()
-    ssh.close()
-    print('Connection Closed')
-
 def write_server(df_i, df_p, desti_file_i, desti_file_p, write_folder_server, sftp_client):
     
     # move to the uploads directory
@@ -175,9 +71,11 @@ def write_server(df_i, df_p, desti_file_i, desti_file_p, write_folder_server, sf
         sftp_client.chdir(write_folder_server) #Test if remote path exists
         print(f'Changed directory to {sftp_client.getcwd()} for upload')
     except IOError:
-        sftp_client.mkdir(write_folder_server) #Create remote path
-        sftp_client.chdir(write_folder_server)
-        print(f'Created & changed directory to {sftp_client.getcwd()} for upload')
+        #sftp_client.mkdir(write_folder_server) #Create remote path
+        #sftp_client.chdir(write_folder_server)
+        #print(f'Created & changed directory to {sftp_client.getcwd()} for upload')
+        print('ERROR_NOTE:Uploads folder not avialable - Failed to upload files!!')
+        return None
 
     # put the df in the uploads directory
     with sftp_client.open(desti_file_i, "w") as f:
@@ -209,7 +107,7 @@ if __name__ == "__main__":
 
         # run type setting
     write_type= ['local', 'server']
-    write_selection = 0 # 0 for local & 1 for server
+    write_selection = 1 # 0 for local & 1 for server
 
     
     #getting current cst date time
@@ -317,8 +215,6 @@ if __name__ == "__main__":
                 write_server(df_i[cols_i], df_p[cols_p], desti_file_i, desti_file_p, write_folder_server, sftp_client)
                 connection_close(ssh, sftp_client)
             else:
-                print('ERROR: Could not connect to Client Server!')
+                print('ERROR_NOTE: Could not connect to Client Server!')
     else:
-        print('No data available from the URL')
-    
-    #trans_conn_load(df_i, df_p, desti_file_i, desti_file_p)
+        print('ERROR_NOTE:Data Extraction Failed')
