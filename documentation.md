@@ -186,6 +186,32 @@ Testing file upload to remote server. This involves the following steps
 
     1. Upload the pandas dataframe as a txt directly to the sever via sftp
 
+    ## Deployment to Google Cloud Functions
+    * The code had to refractored to do the following
+        - Run on the local system for testing
+        - Run on Google Cloud Functions when trigerred by http which require installing the functions framework as follows `pip install functions-framework==3.5.0`
+    
+    * The code was restructured with the following components
+        - `main.py` : the file with the function etl() which would run the entire ETL process . 
+            - If main.py was invoked the etl would write locally. Commands used `python main.py`
+            - If etl() function was invoked via http it would write to the server `functions-framework --target hello --debug --port 8080 `
+        - `requirements.txt`` : contained the packages required for the project which was generated using the `pipreqs`` package as follows
+            ```bash
+            pip install pipreqs
+            pipreqs . --ignore ".my_env" 
+            ```
+        - `Envirinment Variables/Credentials`: These were used in the code by using the `os` package and set
+            - Locally by using `set -o allexport && source .env && set +o allexport` command
+            - On Google Cloud Functions by setting the `environemnt variable` via the Gloud UI
+
+    * Google Cloud Functions Resources
+        - [Google Cloud Functions examples for Python](https://cloud.google.com/functions/docs/samples?language=python)
+        - [Google Cloud Functions basics video](https://www.youtube.com/watch?v=hnqeYOYDRYY&t=2986s)
+        - [Configuring Environment Variables](https://cloud.google.com/functions/docs/configuring/env-var#google-cloud-console-ui_2)
+        - [Configuring Secrets](https://cloud.google.com/functions/docs/configuring/secrets)
+        - [Setting Google Cloud Function Locally For Testing - Example](https://dev.to/bornfightcompany/testing-cloud-functions-with-functions-framework-in-python-9cf)
+        - [Setting secrets example](https://medium.com/google-cloud/managing-secrets-for-gcp-cloud-functions-844a56c8a820)
+        
     ## NOTE:
     * When performing data entry remeber to read the `DATA ENTRY INSTRUCTIONS` sheet first
     * Always remember to enter the mandatory fields

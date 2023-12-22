@@ -6,24 +6,16 @@ from pytz import timezone
 from decouple import config, AutoConfig
 import paramiko as pk
 
-# activate virtual env
-#conda activate .my_env
-# Loading Credentials
-# set the environment variables in the server from the .env file. Run this command in the folder in gitbash
-# set -o allexport && source .env && set +o allexport
-
-config = AutoConfig(search_path='.env')
-USERNAME = config("USER_NAME")
-PASSWORD = config("PASSWORD")
-PORT=config("PORT")
-IP_ADDRESS=config("IP_ADDRESS")
-LOCATION=config("LOCATION_CSCS")
-SPREADSHEET_ID=config("SPREADSHEET_ID")
-
-#testing
-#print(f'Username: {USERNAME}, Password: {PASSWORD}, Port:{PORT}, IP_adress: {IP_ADDRESS}, SpreadsheetId:{SPREADSHEET_ID}')
 
 def extract_gdrive(url, sheets):
+    """Extracts sheets from Gdrive by specifying the url in the pandas read_excel function
+    Args:
+        url (str): the url of the spreadsheet which is the data source
+        username (list): names of the sheets to be extracted
+    Returns:
+        df_i (pandas.dataframe): Pandas df containing inventory data
+        df_p (pandas.dataframe): Pandas df containing production data
+    """
     df_i = None
     df_p = None
     try:
@@ -37,16 +29,26 @@ def extract_gdrive(url, sheets):
     return df_i, df_p
 
 
-def connection_open():
+def connection_open(ip_address, username, password, port):
+    """Opens the ssh & sftp  connection to the server using Paramiko
+    Args:
+        ip_address (str): ip address of the server
+        username (str): username to log into the server
+        password (str): password for the username
+        port (int): the port to connect to
+    Returns:
+        ssh (Paramiko.SSHClient) : contains the ssh connection to the server
+        sftp_client (Paramiko.SFTPClient) : contains the sftp connection to the server
+    """
     ssh = None
     sftp_client = None
     try:
         ssh = pk.SSHClient()
         ssh.set_missing_host_key_policy(pk.AutoAddPolicy())
-        ssh.connect(hostname=IP_ADDRESS, 
-                    username=USERNAME,
-                    password=PASSWORD,
-                    port=PORT)
+        ssh.connect(hostname=ip_address, 
+                    username=username,
+                    password=password,
+                    port=port)
         sftp_client=ssh.open_sftp()
         print('SFTP Connection opened')
     except pk.AuthenticationException:
@@ -56,6 +58,13 @@ def connection_open():
     return ssh, sftp_client
 
 def connection_close(ssh, sftp_client):
+    """Closes the ssh & sftp  connection to the server
+    Args:
+        ssh (Paramiko.SSHClient) : contains the ssh connection to the server
+        sftp_client (Paramiko.SFTPClient) : contains the sftp connection to the server
+    Returns:
+        None
+    """
     # Close the connections
     sftp_client.close()
     ssh.close()
@@ -64,7 +73,17 @@ def connection_close(ssh, sftp_client):
     
 
 def write_server(df_i, df_p, desti_file_i, desti_file_p, write_folder_server, sftp_client):
-    
+    """Writes the dataframes to the uploads folder on the client server as .txt files
+    Args:
+        df_i (pandas.dataframe): Pandas df containing inventory data
+        df_p (pandas.dataframe): Pandas df containing production data
+        desti_file_i (str): output file name for inventory data
+        desti_file_p (str): output file name for production data
+        write_folder_server (str): folder on the server to which the data needs to be written to
+        sftp_client ( paramiko.SFTPClient) : contains the sftp connection to the server
+    Returns:
+        None
+    """
     # move to the uploads directory
     # sftp_client.chdir('./uploads')
     try:
@@ -90,6 +109,16 @@ def write_server(df_i, df_p, desti_file_i, desti_file_p, write_folder_server, sf
 
 
 def write_local(df_i, df_p, desti_file_i, desti_file_p, write_folder_local):
+    """Writes the dataframes to the data folder on the local system
+    Args:
+        df_i (pandas.dataframe): Pandas df containing inventory data
+        df_p (pandas.dataframe): Pandas df containing production data
+        desti_file_i (str): output file name for inventory data
+        desti_file_p (str): output file name for production data
+        write_folder_local (str): local data folder to which the data needs to be written to
+    Returns:
+        None
+    """
     write_path_i = os.path.join(write_folder_local, desti_file_i)
     write_path_p = os.path.join(write_folder_local, desti_file_p)
 
@@ -99,14 +128,33 @@ def write_local(df_i, df_p, desti_file_i, desti_file_p, write_folder_local):
     print(f'Writing production data of size (rows, cols) {df_p.shape} to {desti_file_p}')
     df_p.to_csv(write_path_p, sep=str('|'), index=False)
 
+    return None
 
 
-if __name__ == "__main__":
 
-        # run type setting
+def etl(request):
+    """Responds to any HTTP request and runs the code to perform ETL
+       Extracts spreadsheet form Googlesheets on GDrive
+       Transforms & Loads the data either to local data folder or to the server
+    Args:
+        request (flask.Request): HTTP request object.
+    Returns:
+        The response text indicating if ETL of data was successfull or not.
+    """
+
+    write_selection = 0 if request == 0 else 1
     write_type= ['local', 'server']
-    write_selection = 1 # 0 for local & 1 for server
+    #write_selection = 1 # 0 for local & 1 for server
 
+    env_var = os.environ 
+    username = env_var.get("USER_NAME_CSCS", "Specified environment variable is not set.")
+    password = env_var.get("PASSWORD_CSCS", "Specified environment variable is not set.")
+    port = env_var.get("PORT_CSCS", "Specified environment variable is not set.")
+    ip_address = env_var.get("IP_ADDRESS_CSCS", "Specified environment variable is not set.")
+    spreadsheet_id = env_var.get("SPREADSHEET_ID", "Specified environment variable is not set.")
+
+    #testing
+    print(f'Username: {username}, Password: {password}, Port:{port}, IP_adress: {ip_address}, SpreadsheetId:{spreadsheet_id}')
     
     #getting current cst date time
     central_tz = timezone('US/Central')
@@ -118,11 +166,10 @@ if __name__ == "__main__":
     write_folder_local = 'data'
 
     #server settings
-    write_folder_server = f'/home/{USERNAME}/uploads'
-    
+    write_folder_server = f'/home/{username}/uploads'
 
     # dataset settings
-    url = f'https://drive.google.com/u/0/uc?id={SPREADSHEET_ID}&export=download'
+    url = f'https://drive.google.com/u/0/uc?id={spreadsheet_id}&export=download'
     sheets = ['Aquasource_inventory', 'Aquasource_production']
     
     # Creating list of column names to preserve the order of the columns
@@ -208,11 +255,34 @@ if __name__ == "__main__":
         if write_type[write_selection] == 'local':
             write_local(df_i[cols_i], df_p[cols_p], desti_file_i, desti_file_p, write_folder_local)
         else:
-            ssh, sftp_client = connection_open()
+            ssh, sftp_client = connection_open(ip_address, username, password, port)
             if not [x for x in (ssh, sftp_client) if x is None]:
                 write_server(df_i[cols_i], df_p[cols_p], desti_file_i, desti_file_p, write_folder_server, sftp_client)
                 connection_close(ssh, sftp_client)
+                print('SUCCESS: Files uploaded to server!')
+                return 'SUCCESS: Files uploaded to server!'
             else:
                 print('ERROR_NOTE: Could not connect to Client Server!')
+                return 'ERROR_NOTE: Could not connect to Client Server!'
     else:
-        print('ERROR_NOTE:Data Extraction Failed')
+        print('ERROR_NOTE:Data Extraction Failed, spreadsheet unavailable!')
+        return 'ERROR_NOTE:Data Extraction Failed, spreadsheet unavailable!'
+
+
+
+if __name__ == "__main__":
+    """Calls the etl from the main function to run the etl locally
+    Args:
+        write_selection (int): selection to indicate where to write the output local or server
+    Returns:
+        None
+    Note:
+    - Loading Credentials Locally
+    - set the environment variables in the server from the .env file. Run this command in the folder in gitbash
+    - set -o allexport && source .env && set +o allexport
+    - use below to run the etl function by invoking via http
+    - functions-framework --target hello --debug --port 8080 
+    """
+    write_selection = 0 # 0 to write to local folder & 1 to write to the server
+    
+    etl(write_selection)

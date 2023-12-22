@@ -1,14 +1,9 @@
 # set -o allexport && source .env && set +o allexport
-# SFTP Connection credentials
+# GDrive Spreadsheet Document ID
 SPREADSHEET_ID=
+
+# Server Credentials
 USER_NAME_CSCS=
 PASSWORD_CSCS=
 PORT_CSCS=
-LOCATION_CSCS=
 IP_ADDRESS_CSCS=
-
-# Test Server
-USER_NAME=
-PASSWORD=
-PORT=
-IP_ADDRESS=
