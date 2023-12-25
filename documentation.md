@@ -211,7 +211,12 @@ Testing file upload to remote server. This involves the following steps
         - [Configuring Secrets](https://cloud.google.com/functions/docs/configuring/secrets)
         - [Setting Google Cloud Function Locally For Testing - Example](https://dev.to/bornfightcompany/testing-cloud-functions-with-functions-framework-in-python-9cf)
         - [Setting secrets example](https://medium.com/google-cloud/managing-secrets-for-gcp-cloud-functions-844a56c8a820)
-        
+    
+    ## Setting up Cloud Functions From GitHub
+    1. Connect `GitHub` to `Cloud Source Repository` by following directions from [here](https://cloud.google.com/source-repositories/docs/mirroring-a-github-repository)
+    2. Setting up `Cloud Functions` by pulling code from `Cloud Source Repository` by following directions from [here](https://cloud.google.com/functions/docs/deploy)
+    3. 
+
     ## NOTE:
     * When performing data entry remember to read the `DATA ENTRY INSTRUCTIONS` sheet first
     * Always remember to enter the mandatory fields
