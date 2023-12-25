@@ -213,7 +213,7 @@ Testing file upload to remote server. This involves the following steps
         - [Setting secrets example](https://medium.com/google-cloud/managing-secrets-for-gcp-cloud-functions-844a56c8a820)
         
     ## NOTE:
-    * When performing data entry remeber to read the `DATA ENTRY INSTRUCTIONS` sheet first
+    * When performing data entry remember to read the `DATA ENTRY INSTRUCTIONS` sheet first
     * Always remember to enter the mandatory fields
     * `ShelfLifeDaysRemaining` value is 0 if `ExpirationDate` is crossed
     * During testing do not pull the data from the Googlesheets URL continuously as it will lead to `403: Forbidden` Error as there is a usage limit per 100 seconds
@@ -224,6 +224,16 @@ Testing file upload to remote server. This involves the following steps
         - set the environment variables using `set -o allexport && source .env && +o allexport`
         - check the mode in the transform.py file if it is `local` or `server`
         - run the code as `python transform.py`
+    * Running the project
+        - Activate the virtual environment `conda activate .my_env`
+        - Set the environment variables from the .env file with the credentials to connect to the server. Run the following command in the project folder in gitbash terminal `set -o allexport && source .env && set +o allexport`
+        - `Locally for testing without Functions Framework and running via main() function`
+            * To write to local data folder `python main.py --write_server=0`
+            * To write to server `python main.py` or `python main.py --write_server=1`
+        - `Locally for testing with Functions Framework to invoke via http the etl() function`
+            * Run the command `functions-framework --target etl --debug --port 8080`
+            * To write to local data folder goto web browser & copy paste `http://192.168.0.38:8080/?message=0` message here could be of value 0 to write to local data folder and 1 to write to server
+            4. To write to server `http://192.168.0.38:8080` or `http://192.168.0.38:8080/?message=1`
 
   
 

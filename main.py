@@ -5,6 +5,8 @@ from datetime import datetime
 from pytz import timezone
 from decouple import config, AutoConfig
 import paramiko as pk
+import functions_framework
+import requests
 
 
 def extract_gdrive(url, sheets):
@@ -141,11 +143,9 @@ def etl(request):
     Returns:
         The response text indicating if ETL of data was successfull or not.
     """
-
-    write_selection = 0 if request == 0 else 1
-    write_type= ['local', 'server']
-    #write_selection = 1 # 0 for local & 1 for server
-
+    print(f'Value of requests passed to etl() {request} and type is {type(request)}')
+    write_server = 1
+    
     env_var = os.environ 
     username = env_var.get("USER_NAME_CSCS", "Specified environment variable is not set.")
     password = env_var.get("PASSWORD_CSCS", "Specified environment variable is not set.")
@@ -156,17 +156,26 @@ def etl(request):
     #testing
     print(f'Username: {username}, Password: {password}, Port:{port}, IP_adress: {ip_address}, SpreadsheetId:{spreadsheet_id}')
     
+    
+    if request in ['0', '1']:
+        write_server = int(request)
+    else:
+        request_json = request.get_json(force=True, silent=True, cache=True)  
+        # see https://flask.palletsprojects.com/en/2.0.x/api/ get_json Parse data as JSON
+        #in v.2.1 of the Flask framework they changed the impl of the get_json and if the content type if not provided it returns http 400 - BAD Requests, therefore we are usong now force=true and silent=true
+        if request.args and 'message' in request.args:
+            write_server = int(request.args.get('message'))
+        elif request_json and 'message' in request_json:
+            write_server = int(request_json['message'])
+    
+    print(f'Value of write_server set to {write_server} and type is {type(write_server)}')
+
     #getting current cst date time
     central_tz = timezone('US/Central')
     date_frmt = '%Y%m%d_%H%M'
     my_date = datetime.now(central_tz).strftime(date_frmt)
     print(my_date)
 
-    # local settings
-    write_folder_local = 'data'
-
-    #server settings
-    write_folder_server = f'/home/{username}/uploads'
 
     # dataset settings
     url = f'https://drive.google.com/u/0/uc?id={spreadsheet_id}&export=download'
@@ -249,12 +258,21 @@ def etl(request):
 
     # EXTRACTION
     df_i, df_p = extract_gdrive(url, sheets)
+    #df_i, df_p = None, None
+    
 
     # TRANSFORMATION & LOAD
     if not [x for x in (df_i, df_p) if x is None]:
-        if write_type[write_selection] == 'local':
+        if write_server == 0:
+            # local settings
+            print('NOTE: Writing data locally')
+            write_folder_local = 'data'
             write_local(df_i[cols_i], df_p[cols_p], desti_file_i, desti_file_p, write_folder_local)
+            print('SUCCESS: Files written to local data folder!')
+            return 'SUCCESS: Files written to local data folder'
         else:
+            #server settings
+            write_folder_server = f'/home/{username}/uploads'
             ssh, sftp_client = connection_open(ip_address, username, password, port)
             if not [x for x in (ssh, sftp_client) if x is None]:
                 write_server(df_i[cols_i], df_p[cols_p], desti_file_i, desti_file_p, write_folder_server, sftp_client)
@@ -268,7 +286,11 @@ def etl(request):
         print('ERROR_NOTE:Data Extraction Failed, spreadsheet unavailable!')
         return 'ERROR_NOTE:Data Extraction Failed, spreadsheet unavailable!'
 
+def main(write_server: int=1):
+    # 0 to write to local folder & 
+    # 1 to write to the server
 
+    etl(write_server)
 
 if __name__ == "__main__":
     """Calls the etl from the main function to run the etl locally
@@ -283,6 +305,14 @@ if __name__ == "__main__":
     - use below to run the etl function by invoking via http
     - functions-framework --target hello --debug --port 8080 
     """
-    write_selection = 0 # 0 to write to local folder & 1 to write to the server
-    
-    etl(write_selection)
+    import argparse
+    parser = argparse.ArgumentParser(description='ETL Pipeline to pull data from Gdrive and write Client Server or Locally\n \
+                                     You are running the ETL Pipeline from local system now \
+                                     Options to Enter:\n \
+                                     0-To write Locally \n \
+                                     1-To write to the server\
+                                     NOTE: The DEFAULT is 1')
+    parser.add_argument('--write_server', metavar='int', required=False, nargs='?', const=1,
+                        help='Enter 0 or 1')
+    args = parser.parse_args()
+    main(write_server=args.write_server)
