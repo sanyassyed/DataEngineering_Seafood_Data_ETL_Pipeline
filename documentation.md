@@ -215,7 +215,15 @@ Testing file upload to remote server. This involves the following steps
     ## Setting up Cloud Functions From GitHub
     1. Connect `GitHub` to `Cloud Source Repository` by following directions from [here](https://cloud.google.com/source-repositories/docs/mirroring-a-github-repository)
     2. Setting up `Cloud Functions` by pulling code from `Cloud Source Repository` by following directions from [here](https://cloud.google.com/functions/docs/deploy)
-    3. 
+    
+    ## Use Secrets Instead of Environment Variables
+    * Follow directions [here](https://cloud.google.com/functions/docs/configuring/secrets) to 
+        1. to create the secrets
+        2. add the secrets as environment variables
+    
+    ## Create VM on GCP
+    * Log into the vm from your local PC after adding the public key to `METADATA` using the command `ssh -i ~/.ssh/id_rsa sanya@external_ip`
+    * Follow the steps in [here](#data-loading) to create a user on the VM
 
     ## NOTE:
     * When performing data entry remember to read the `DATA ENTRY INSTRUCTIONS` sheet first

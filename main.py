@@ -74,7 +74,7 @@ def connection_close(ssh, sftp_client):
     return None
     
 
-def write_server(df_i, df_p, desti_file_i, desti_file_p, write_folder_server, sftp_client):
+def write_to_server(df_i, df_p, desti_file_i, desti_file_p, write_folder_server, sftp_client):
     """Writes the dataframes to the uploads folder on the client server as .txt files
     Args:
         df_i (pandas.dataframe): Pandas df containing inventory data
@@ -275,7 +275,7 @@ def etl(request):
             write_folder_server = f'/home/{username}/uploads'
             ssh, sftp_client = connection_open(ip_address, username, password, port)
             if not [x for x in (ssh, sftp_client) if x is None]:
-                write_server(df_i[cols_i], df_p[cols_p], desti_file_i, desti_file_p, write_folder_server, sftp_client)
+                write_to_server(df_i[cols_i], df_p[cols_p], desti_file_i, desti_file_p, write_folder_server, sftp_client)
                 connection_close(ssh, sftp_client)
                 print('SUCCESS: Files uploaded to server!')
                 return 'SUCCESS: Files uploaded to server!'
