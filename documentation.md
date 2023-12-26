@@ -261,9 +261,28 @@ Testing file upload to remote server. This involves the following steps
             * To write to local data folder goto web browser & copy paste `http://192.168.0.38:8080/?message=0` message here could be of value 0 to write to local data folder and 1 to write to server
             4. To write to server `http://192.168.0.38:8080` or `http://192.168.0.38:8080/?message=1`
     * Running the project on GCP
-        - Updating the Cloud Function by syncing the Source Repository with GitHub manually [here](https://source.cloud.google.com/admin/settings?projectId=cscs-etl&repository=github_sanyassyed_seafoodproject) 
+        - Updating the Cloud Function by 
+            1. syncing the Source Repository with GitHub manually [here](https://source.cloud.google.com/admin/settings?projectId=cscs-etl&repository=github_sanyassyed_seafoodproject) 
+            2. Re-deploying the Cloud function so it uses the latest updated code from Source Repository
         - Monitor the logs of the Cloud Function [here](https://console.cloud.google.com/functions/details/us-central1/etl_test?env=gen1&project=cscs-etl&tab=logs)
         - Monitor Logs of scheduler in the `Logging Service` [here](https://console.cloud.google.com/logs/query;query=resource.type%3D%22cloud_scheduler_job%22%20AND%20resource.labels.job_id%3D%22etl_cron_test%22%20AND%20resource.labels.location%3D%22us-central1%22;cursorTimestamp=2023-12-26T04:18:13.331752135Z;startTime=2023-12-26T03:18:48.523Z;endTime=2023-12-26T04:18:48.523Z?project=cscs-etl)
+    * Remember to Turn off after testing
+        - VM - Delete once completed testing for good
+        - Pause the scheduler
+
+    ## Services Used
+    * GCP:
+        - Source Repositories
+        - Cloud Functions
+        - Cloud Scheduler
+        - Compute Engine
+        - Secret Manager
+    * Google Spreadsheets
+
+    ### TODO:
+    Test with the oracle server
+    Add the ip_address to firewall
+
 
 
   
