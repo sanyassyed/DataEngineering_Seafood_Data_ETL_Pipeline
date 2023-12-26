@@ -212,19 +212,32 @@ Testing file upload to remote server. This involves the following steps
         - [Setting Google Cloud Function Locally For Testing - Example](https://dev.to/bornfightcompany/testing-cloud-functions-with-functions-framework-in-python-9cf)
         - [Setting secrets example](https://medium.com/google-cloud/managing-secrets-for-gcp-cloud-functions-844a56c8a820)
     
-    ## Setting up Cloud Functions From GitHub
-    1. Connect `GitHub` to `Cloud Source Repository` by following directions from [here](https://cloud.google.com/source-repositories/docs/mirroring-a-github-repository)
-    2. Setting up `Cloud Functions` by pulling code from `Cloud Source Repository` by following directions from [here](https://cloud.google.com/functions/docs/deploy)
+    ## Setting up Cloud Source Repositories on GCP by connecting it to repo on GitHub
+    * Connect `GitHub` to `Cloud Source Repository` by following directions from [here](https://cloud.google.com/source-repositories/docs/mirroring-a-github-repository)
     
-    ## Use Secrets Instead of Environment Variables
+    
+    ## Setting up Cloud Functions using code from Cloud Sourse Repositories
+    * Setting up `Cloud Functions` by pulling code from `Cloud Source Repository` by following directions from [here](https://cloud.google.com/functions/docs/deploy)
+
+    ## Use Secrets using Secret Manager on GCP Instead of Environment Variables
     * Follow directions [here](https://cloud.google.com/functions/docs/configuring/secrets) to 
         1. to create the secrets
         2. add the secrets as environment variables
     
     ## Create VM on GCP
     * Log into the vm from your local PC after adding the public key to `METADATA` using the command `ssh -i ~/.ssh/id_rsa sanya@external_ip`
-    * Follow the steps in [here](#data-loading) to create a user on the VM
+    * Follow the steps in [here](#data-loading) to create a user on the VM and add the credentials to the `SECRET KEYS` using `SECRET MANAGER` on GCP
 
+    ## Create Cloud Scheduler
+    * Follow the instructions [here](https://github.com/GoogleCloudPlatform/community/blob/master/archived/using-scheduler-invoke-private-functions-oidc/index.md)
+    * Setting the SeviceAccount for the Scheduler [here](https://cloud.google.com/scheduler/docs/http-target-auth)
+    * Add OIDC as the authentication header as shown [here](https://stackoverflow.com/questions/63980844/getting-permission-denied-error-when-calling-google-cloud-function-from-cloud-sc)
+    * Remeber the Scheduler has the following set 
+        - Service account for the schduler `service-PROJECT_NUMBER@gcp-sa-cloudscheduler.iam.gserviceaccount.com` with the role `Cloud Scheduler Service Agent` & `Cloud Functions Invoker`
+        - The `Auth Header` is `Add OIDC token`, here select the above cloud scheduler service account
+        - In `Audience` specify the `Target URL`
+
+    
     ## NOTE:
     * When performing data entry remember to read the `DATA ENTRY INSTRUCTIONS` sheet first
     * Always remember to enter the mandatory fields
@@ -237,7 +250,7 @@ Testing file upload to remote server. This involves the following steps
         - set the environment variables using `set -o allexport && source .env && +o allexport`
         - check the mode in the transform.py file if it is `local` or `server`
         - run the code as `python transform.py`
-    * Running the project
+    * Running the project - Locally
         - Activate the virtual environment `conda activate .my_env`
         - Set the environment variables from the .env file with the credentials to connect to the server. Run the following command in the project folder in gitbash terminal `set -o allexport && source .env && set +o allexport`
         - `Locally for testing without Functions Framework and running via main() function`
@@ -247,6 +260,11 @@ Testing file upload to remote server. This involves the following steps
             * Run the command `functions-framework --target etl --debug --port 8080`
             * To write to local data folder goto web browser & copy paste `http://192.168.0.38:8080/?message=0` message here could be of value 0 to write to local data folder and 1 to write to server
             4. To write to server `http://192.168.0.38:8080` or `http://192.168.0.38:8080/?message=1`
+    * Running the project on GCP
+        - Updating the Cloud Function by syncing the Source Repository with GitHub manually [here](https://source.cloud.google.com/admin/settings?projectId=cscs-etl&repository=github_sanyassyed_seafoodproject) 
+        - Monitor the logs of the Cloud Function [here](https://console.cloud.google.com/functions/details/us-central1/etl_test?env=gen1&project=cscs-etl&tab=logs)
+        - Monitor Logs of scheduler in the `Logging Service` [here](https://console.cloud.google.com/logs/query;query=resource.type%3D%22cloud_scheduler_job%22%20AND%20resource.labels.job_id%3D%22etl_cron_test%22%20AND%20resource.labels.location%3D%22us-central1%22;cursorTimestamp=2023-12-26T04:18:13.331752135Z;startTime=2023-12-26T03:18:48.523Z;endTime=2023-12-26T04:18:48.523Z?project=cscs-etl)
+
 
   
 

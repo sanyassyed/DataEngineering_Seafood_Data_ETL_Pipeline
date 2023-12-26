@@ -253,8 +253,8 @@ def etl(request):
               'FreezerInboundQuantity']
     
     # file name format = supplier_name_suppinv_YYYYMMDD_HHmm
-    desti_file_i = f"TEST_supplier_name_suppinv_{my_date}.txt"
-    desti_file_p = f"TEST_supplier_name_suppprod_{my_date}.txt"
+    desti_file_i = f"TEST_aquasource_suppinv_{my_date}.txt"
+    desti_file_p = f"TEST_aquasource_suppprod_{my_date}.txt"
 
     # EXTRACTION
     df_i, df_p = extract_gdrive(url, sheets)
