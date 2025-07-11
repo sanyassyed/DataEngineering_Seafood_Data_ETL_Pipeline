@@ -17,5 +17,6 @@ data/*
 aq_upload/*
 # exception to the rule
 !data/.gitkeep 
+!data/sample.xlsx
 !aq_upload/.gitkeep
 __pycache__/
