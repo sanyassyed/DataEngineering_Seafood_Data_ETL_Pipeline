@@ -280,8 +280,13 @@ Testing file upload to remote server. This involves the following steps
     * Google Spreadsheets
 
     ### TODO:
-    Test with the oracle server
-    Add the ip_address to firewall
+
+    - [ ] Test with the oracle server
+    - [ ] Add the ip_address to firewall
+    - [ ] Retest the functions and scheduler 
+    - [ ] Setup the project via terraform 
+        - [ ] setup and delete
+        - [ ] have a dev environment and prod environment
 
 
 
