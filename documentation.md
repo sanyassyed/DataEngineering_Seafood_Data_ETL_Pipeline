@@ -284,6 +284,7 @@ Testing file upload to remote server. This involves the following steps
     - [ ] Test with the oracle server
     - [ ] Add the ip_address to firewall
     - [ ] Retest the functions and scheduler 
+    - [ ] Setup GCP resources via cmd
     - [ ] Setup the project via terraform 
         - [ ] setup and delete
         - [ ] have a dev environment and prod environment

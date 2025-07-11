@@ -8,6 +8,8 @@
 # Credentials Folder
 credentials/*
 !credentials/.gitkeep
+!credentials/secret_sample.json
+
 
 # Data files
 # exclude everything
